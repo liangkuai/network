@@ -1,6 +1,6 @@
 # TCP
 
-Transmission Control Protocol，传输控制协议
+Transmission Control Protocol，传输控制协议。数据单元：TCP 报文段。
 
 
 ### 首部字段
@@ -23,40 +23,58 @@ Transmission Control Protocol，传输控制协议
 - 窗口（rwnd）：表示这个报文段的发送方的接受窗口，也就是允许对方发送的数据量
 
 
-### TCP 连接 - 三次握手
+### TCP 连接管理 - 建立连接 - 三次握手
+
+> 建立 TCP 连接要解决的三大问题：
+>
+> 1. 让 TCP 双方能够确知对方的存在
+> 2. 让 TCP 双方能够协商一写参数；如：最大窗口值等
+> 3. 让 TCP 双方能够对系统资源进行分配；如：缓存大小、变量
 
 ![三次握手](./../../assets/img/运输层/三次握手.png)
 
-假设 A 为 Client，B 为 Server。
+假设 A 为 Client，B 为 Server；**Server 现处于 `LISTEN` 状态**。
 
 1. 第一次
 
-    - 首先 Server 处于 `LISTEN`（监听）状态，等待客户的连接请求。
-    - Client 向 Server 发送连接请求报文，`SYN=1`，`ACK=0`，选择一个初始的序号 x。
+    - Client 向 Server 发送 TCP 连接请求报文段，并进入 `SYN_SEND` （同步已发送）状态。
+    - TCP 连接请求报文段中，`SYN=1`，`seq=x`。
+
+> TCP 规定，SYN 报文段（SYN=1 的报文段）不能携带数据，但需要消耗掉一个序号。
 
 2. 第二次
 
-    - Server 收到连接请求报文，如果同意建立连接，则向 Client 发送连接确认报文，`SYN=1`，`ACK=1`，确认号为 x+1，同时也选择一个初始的序号 y。
+    - Server 收到 TCP 连接请求报文段后，如果同意建立连接，就向 Client 发送 TCP 连接请求确认报文段，并进入 `SYN_RCVD` （同步已接收）状态。
+    - TCP 连接请求确认报文段中，`SYN=1`，`ACK=1`，`seq=y`，`ack=x+1`。
 
 3. 第三次
 
-    - Client 收到 Server 的连接确认报文后，还要向 Server 发出确认，`ACK=1`，确认号为 y+1，序号为 x+1。
-    - Server 收到 Client 的确认后，连接建立。
+    - Client 收到 TCP 连接请求确认报文段后，还要向 Server 发送一个普通的 TCP 确认报文段，并进入 `ESTABLISHED` （连接已建立）状态。
+    - 这个普通的 TCP 确认报文段中，`ACK=1`，`seq=x+1`，`ack=y+1`，**可携带数据**
+    - Server 收到确认报文段后，也进入 `ESTABLISHED` （连接已建立）状态。。
 
-#### 为什么要三次握手？
+> TCP 规定，ACK 报文段可以携带数据，但是如果不携带数据则不消耗序号。
 
-三次握手的目的是建立可靠的通信信道，说到通讯，简单来说就是数据的发送与接收，而三次握手最主要的目的就是双方确认自己与对方的发送与接收是正常的。
+#### 为什么 Client 最后还要发送一次确认（能否改用两次握手）？
+
+如果使用两次握手，有这样一种场景，
+
+- Client 发送了第一个连接请求报文段 r1，因为在网络结点中滞留的时间太长，Client 迟迟没有收到连接请求确认报文段，以为 Server 没有收到，此时重新向 Server 发送第二个连接请求报文段 r2，然后 Client 和 Server 经过两次握手完成连接，传输数据，然后关闭连接。
+
+- 此时之前滞留的第一个连接请求报文段 r1，终于到达了 Server，这个报文端本该是失效的，但是两次握手的机制会让 Server 再次进入 `ESTABLISHED` 状态，这将导致不必要的错误和资源的浪费。
+
+使用三次握手，就算是第一次失效的连接请求报文端传送过来了，Server 接受到了并且回复了连接请求确认报文段，但是 Client 已关闭不会再次发出确认报文段。由于 Server 收不到确认，就知道 Client 并没有请求连接。
+
+除此之外，三次握手的目的是建立可靠的通信信道，包括双方确认自己与对方的发送与接收是正常的。
 
 | 次序 | Client | Client 状态 | Server | Server 状态 |
 | --- | --- | --- | --- | --- | 
-| 第一次握手 |  | SYN_SEND | 自己接受正常<br>对方发送正常 | LISTEN |
-| 第二次握手 | 自己发送、接收正常<br>对方发送、接收正常 | SYN_SEND |  | SYN_RCVD |
-| 第三次握手 |  | ESTABLISHED | 自己发送正常<br>对方接收正常 | ESTABLISHED |
-
-所以三次握手就能确认双发收发功能都正常，缺一不可。
+| 第一次握手 |  | CLOSE -> SYN_SEND | Server 接受正常<br>Client 发送正常 | LISTEN |
+| 第二次握手 | Client 发送、接收正常<br>Server 发送、接收正常 | SYN_SEND | Server 为 TCP 连接分配缓存、变量 | LISTEN -> SYN_RCVD |
+| 第三次握手 | Client 为 TCP 连接分配缓存、变量 | SYN_SEND -> ESTABLISHED | Server 发送正常<br>Client 接收正常 | SYN_RCVD -> ESTABLISHED |
 
 
-### TCP 断开连接 - 四次挥手
+### TCP 连接管理 - 释放连接 - 四次挥手
 
 ![四次挥手](./../../assets/img/运输层/四次挥手.jpeg)
 
@@ -87,6 +105,10 @@ Transmission Control Protocol，传输控制协议
 
 
 ### 参考
+
+- [5.8.1 TCP的运输连接管理 - 湖科大教书匠 - bilibili](https://www.bilibili.com/video/BV1c4411d7jb?p=64)
+
+- [5.3.2 TCP连接管理 - 王道论坛 - bilibili](https://www.bilibili.com/video/BV19E411D78Q?p=64)
 
 - [计算机网络常见面试题 - Snailclimb - GitHub](https://github.com/Snailclimb/JavaGuide/blob/master/docs/network/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.md)
 

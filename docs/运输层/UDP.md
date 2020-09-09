@@ -1,6 +1,6 @@
 # UDP
 
-User Datagram Protocol，用户数据报协议
+User Datagram Protocol，用户数据报协议。数据单元：UDP 用户数据报。
 
 
 ### 首部格式
