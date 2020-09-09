@@ -33,7 +33,7 @@ Transmission Control Protocol，传输控制协议。数据单元：TCP 报文�
 
 ![三次握手](./../../assets/img/运输层/三次握手.png)
 
-假设 A 为 Client，B 为 Server；**Server 现处于 `LISTEN` 状态**。
+**假设 A 为 TCP Client，B 为 TCP Server；Server 现处于 `LISTEN` 状态。**
 
 1. 第一次
 
@@ -50,7 +50,7 @@ Transmission Control Protocol，传输控制协议。数据单元：TCP 报文�
 3. 第三次
 
     - Client 收到 TCP 连接请求确认报文段后，还要向 Server 发送一个普通的 TCP 确认报文段，并进入 `ESTABLISHED` （连接已建立）状态。
-    - 这个普通的 TCP 确认报文段中，`ACK=1`，`seq=x+1`，`ack=y+1`，**可携带数据**
+    - 这个普通的 TCP 确认报文段中，`ACK=1`，`seq=x+1`，`ack=y+1`，**可携带数据**。
     - Server 收到确认报文段后，也进入 `ESTABLISHED` （连接已建立）状态。。
 
 > TCP 规定，ACK 报文段可以携带数据，但是如果不携带数据则不消耗序号。
@@ -61,9 +61,9 @@ Transmission Control Protocol，传输控制协议。数据单元：TCP 报文�
 
 - Client 发送了第一个连接请求报文段 r1，因为在网络结点中滞留的时间太长，Client 迟迟没有收到连接请求确认报文段，以为 Server 没有收到，此时重新向 Server 发送第二个连接请求报文段 r2，然后 Client 和 Server 经过两次握手完成连接，传输数据，然后关闭连接。
 
-- 此时之前滞留的第一个连接请求报文段 r1，终于到达了 Server，这个报文端本该是失效的，但是两次握手的机制会让 Server 再次进入 `ESTABLISHED` 状态，这将导致不必要的错误和资源的浪费。
+- 此时之前滞留的第一个连接请求报文段 r1，终于到达了 Server，这个报文段本该是失效的，但是两次握手的机制会让 Server 再次进入 `ESTABLISHED` 状态，这将导致不必要的错误和资源的浪费。
 
-使用三次握手，就算是第一次失效的连接请求报文端传送过来了，Server 接受到了并且回复了连接请求确认报文段，但是 Client 已关闭不会再次发出确认报文段。由于 Server 收不到确认，就知道 Client 并没有请求连接。
+使用三次握手，就算是第一次失效的连接请求报文段传送过来了，Server 接受到了并且回复了连接请求确认报文段，但是 Client 已关闭不会再次发出确认报文段。由于 Server 收不到确认，就知道 Client 并没有请求连接。
 
 除此之外，三次握手的目的是建立可靠的通信信道，包括双方确认自己与对方的发送与接收是正常的。
 
@@ -78,27 +78,33 @@ Transmission Control Protocol，传输控制协议。数据单元：TCP 报文�
 
 ![四次挥手](./../../assets/img/运输层/四次挥手.jpeg)
 
-假设 A 为 Client，B 为 Server。
+**假设 A 为 TCP Client，B 为 TCP Server。**
 
 1. 第一次
 
-    - Client 发送连接释放报文，`FIN=1`。
+    - 应用进程主动关闭 TCP 连接。
+    - Client 发送 TCP 连接释放报文段，并进入 `FIN_WAIT_1` （终止等待1）状态。
+    - TCP 连接释放报文段中，`FIN=1`，`ACK=1`，`seq=u`，`ack=v`。
 
 2. 第二次
 
-    - Server 收到之后发出确认，此时 TCP Server 能向 Client 发送数据但是 Client 不能向 Server 发送数据。
+    - Server 收到 TCP 连接释放报文段后，会发送一个普通的确认报文段，并进入 `CLOSE_WAIT` （关闭等待）状态。
+    - 确认报文段中，`ACK=`，`seq=v`，`ack=u+1`。
+    - TCP Server 通知应用进程：Client 要断开 TCP 连接。
+    - **此时TCP 连接处于半关闭状态，Client 不能再发送数据，但 Server 还可以继续发送数据。**
+    - Client 收到确认报文段后进入 `FIN_WAIT_2`（终止等待2）状态，等待 Server 发出的 TCP 连接释放报文段。
 
 3. 第三次
 
-    - 当 Server 不再需要连接时，发送连接释放报文，`FIN=1`。
+    - 当应用进程没有数据要发送了，就通知 TCP Server 释放连接。（被动关闭连接）
+    - Server 发送 TCP 连接释放报文段，并进入 `LAST_ACK` （最后确认）状态。
+    - TCP 连接释放报文段中，`FIN=1`，`ACK=1`，`seq=w`，`ack=u+1`。
 
 4. 第四次
 
-    - Client 收到后发出确认，进入 `TIME-WAIT` 状态，等待 2 MSL（最大报文存活时间）后释放连接。
-    - Server 收到 Client 的确认后释放连接。
-
-
-
+    - Client 收到 TCP 连接释放报文段后，发送一个普通的确认报文段，并进入 `TIME_WAIT` （时间等待）状态，**在等待 2 MSL（最大报文存活时间）后才进入 `CLOSE` 状态**。
+    - 确认报文段中，`ACK=1`，`seq=u+1`，`ack=w+1`。
+    - Server 收到确认报文段后，进入 `CLOSE` 状态。
 
 
 
