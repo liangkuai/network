@@ -29,7 +29,7 @@ TCP 使用**滑动窗口机制**实现对发送方的流量控制。TCP 接收�
 2. 待接收
 3. 不可用
 
-结束窗口（rwnd）=「待接收」
+接收窗口（rwnd）=「待接收」
 
 
 ### 0 窗口问题与持续计时器 
@@ -58,5 +58,5 @@ TCP 使用**滑动窗口机制**实现对发送方的流量控制。TCP 接收�
 ### 参考
 
 - [5.3.4 流量控制 - 计算机网络 - 王道论坛 - bilibili](https://www.bilibili.com/video/BV19E411D78Q?p=66)
-- [5.4 TCP的流量控制 - 计算机网络微课堂 - 湖科大教书匠 - bilibili](https://www.bilibili.com/video/BV1c4411d7jb?p=57)
+- [5.4 TCP的流量控制 - 计算机网络微课堂 - 湖科大教书匠 - bilibili](https://www.bilibili.com/video/BV1c4411d7jb?p=60)
 - [30张图解： TCP 重传、滑动窗口、流量控制、拥塞控制发愁 - 小林coding的文章 - 知乎](https://zhuanlan.zhihu.com/p/133307545)
