@@ -61,3 +61,7 @@ intermediate CA 是 Root CA 信任的证书颁发机构，还具有由 Root CA �
 
 客户端先使用本地根证书的公钥验证证书 2，确认此 intermediate CA 是否可信；然后再使用证书 2 中的公钥验证证书 1，最后获取证书 1 中的服务端公钥。
 
+
+### 参考
+
+- [SSL/TLS协议详解(中)——证书颁发机构](https://xz.aliyun.com/t/2530)

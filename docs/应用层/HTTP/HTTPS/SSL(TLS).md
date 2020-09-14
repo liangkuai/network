@@ -30,12 +30,12 @@ TLS 包含几个子协议，你也可以理解为它是由几个不同职责的�
 这个“握手”过程与 TCP 有些类似，是 HTTPS 和 TLS 协议里最重要、最核心的部分。
 
 #### 1. ECDHE 握手过程
-|  | Client | Server |
-| :---: | :---: | :---: |
-| Client Hello | Client（通常是浏览器）先向 Server 发出加密通信的请求。
 
-- 客户端使用的 TLS 协议的版本，如：TLS 1.2<br />- 一个客户端生成的随机数（Client Random）<br />- 密码套件列表<br /> |  |
-| Server Hello |  | Server 收到 Client 请求后，向 Client 发出回应。<br />Server 的回应包含以下内容：<br />- 确认使用的 TLS 版本<br />- 一个服务端生成的随机数（Server Random）<br />- 服务器证书（Server Certificate）<br /> |
-|  |  |  |
-
+| 步骤 | Client | Server |
+| --- | --- | --- |
+| Client Hello | Client（通常是浏览器）先向 Server 发出加密通信的请求。包含：<br />1. 客户端使用的 TLS 协议的版本，如：TLS 1.2<br />2. 一个客户端生成的随机数（Client Random）<br />3. 密码套件列表 |  |
+| Server Hello |  | Server 收到 Client 请求后，向 Client 返回响应。包含：<br />1. 确认使用的 TLS 版本<br />2. 一个服务端生成的随机数（Server Random）<br />3. 确认使用的密码套件<br />4.服务器证书（Server Certificate） |
+|  | Client 收到 Server 的响应之后，首先通过浏览器或者操作系统中的 CA 公钥，确认服务器的数字证书的真实性。<br /><br />如果证书没有问题，Client 会从数字证书中取出服务器的公钥，然后使用它加密报文，向服务器发送请求，包含：<br />1. 一个随机数（Pre-Master Key） <br />2. 加密通信算法改变通知，表示随后的信息都将用「会话秘钥」加密通信。<br />3. Client 握手结束通知，表示 Client 的握手阶段已经结束。同时把之前所有步骤产生的数据做个摘要，用来供 Server 校验。<br /><br />Client 根据三个随机数和协商的加密算法，生成本次通信的「会话密钥」 |  |
+|  |  | Server 收到第三个随机数，使用协商的加密算法生成本次通信的「会话密钥」，向 Client 返回响应，包含：<br />1.加密通信算法改变通知，表示随后的信息都将用「会话秘钥」加密通信。<br />2. Server 握手结束通知，表示 Server 的握手阶段已经结束。同时把之前所有步骤产生的数据做个摘要，用来供 Client 校验。  |
+|  | 进行加密通信 | 进行加密通信 |
 

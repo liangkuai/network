@@ -29,3 +29,14 @@ HTTPS 把下层的传输协议由 TCP 协议改成了 SSL/TLS 协议，由 SSL/T
 
 
 ### SSL/TLS 协议
+
+
+
+
+
+
+### 参考
+
+- [硬核！30 张图解 HTTP 常见的面试题 - 小林coding的文章 - 知乎](https://zhuanlan.zhihu.com/p/111716047)
+- [看完还不懂HTTPS我直播吃翔 - winwill2012的文章 - 知乎](https://zhuanlan.zhihu.com/p/25976060)
+- [SSL/TLS协议详解(下)——TLS握手协议](https://xz.aliyun.com/t/2531)
