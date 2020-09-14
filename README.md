@@ -1,13 +1,13 @@
 # 计算机网络
 
-### [应用层](./docs/应用层/README.md)
+### [应用层](/docs/应用层/README.md)
 
 - [ ] DNS
 - [ ] HTTP
 - [ ] SMTP
 
 
-### [运输层](./docs/运输层/README.md)
+### [运输层](/docs/运输层/README.md)
 
 - 复用和分用、端口号
 
@@ -54,3 +54,6 @@
 
 - [计算机网络 - 王道论坛 - bilibili](https://www.bilibili.com/video/BV19E411D78Q)
 - [计算机网络微课堂 - 湖科大教书匠 - bilibili](https://www.bilibili.com/video/BV1c4411d7jb)
+
+
+![TCP/IP协议](./assets/img/TCP-IP.gif)
