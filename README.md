@@ -1,7 +1,8 @@
 # 计算机网络
 
 ### [应用层](/docs/应用层)
-- [x] [DNS](/docs/应用层/DNS.md)
+
+- DNS
 - [ ] HTTP
 - [ ] SMTP
 
